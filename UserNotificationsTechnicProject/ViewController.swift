@@ -55,6 +55,17 @@ class ViewController: UIViewController, UNUserNotificationCenterDelegate {
         
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
         center.add(request)
+        
+        
+        let content2 = UNMutableNotificationContent()
+        content2.title = "Hello! How are you?"
+        content2.body = "Fine! And you?"
+        content2.categoryIdentifier = "alarm"
+        content2.userInfo = ["customData" : "randomData"]
+        content2.sound = .defaultCritical
+        
+        let request2 = UNNotificationRequest(identifier: UUID().uuidString, content: content2, trigger: trigger)
+        center.add(request2)
     }
     
     func registerCategories() {
@@ -66,8 +77,9 @@ class ViewController: UIViewController, UNUserNotificationCenterDelegate {
         
         // UNNotificationAction creates an individual button for the user to tap
         let show = UNNotificationAction(identifier: "show", title: "Tell me more", options: .foreground)
+        let greet = UNNotificationAction(identifier: "greet", title: "Greet me", options: .foreground)
         // UNNotificationCategory groups multiple buttons together under a single identifier
-        let category = UNNotificationCategory(identifier: "alarm", actions: [show], intentIdentifiers: [], options: [])
+        let category = UNNotificationCategory(identifier: "alarm", actions: [show, greet], intentIdentifiers: [], options: [])
         
         center.setNotificationCategories([category])
     }
@@ -79,12 +91,14 @@ class ViewController: UIViewController, UNUserNotificationCenterDelegate {
         let userInfo = response.notification.request.content.userInfo
         //We attached some customer data to the userInfo property of the notification content, and this is where it gets handed back – here we can link the notification to whatever app content it relates to.
         
-        if let customData = userInfo["customData"] as! String? {
+        if let customData = userInfo["customData"] as? String {
             print("Custom data received: \(customData)")
+            
             
             switch response.actionIdentifier {
             case UNNotificationDefaultActionIdentifier: print("Default identifier") // that gets sent when the user swiped on the notification to unlock their device and launch the app
             case "show": print("Show more information") // the user tapped our "show more info…" button
+            case "greet": print("Greetings!")
             default: break
             }
         }
